@@ -76,19 +76,13 @@ class RandomWalk(Node):
 
         self.pose_saved=position
 
+        # Initialize
         if self.start is None:
             self.start = self.pose_saved
 
         if self.last_saved is None:
             self.last_saved = position
         
-        #Example of how to identify a stall..need better tuned position deltas; wheels spin and example fast
-        #diffX = math.fabs(self.pose_saved.x- position.x)
-        #diffY = math.fabs(self.pose_saved.y - position.y)
-        #if (diffX < 0.0001 and diffY < 0.0001):
-           #self.stall = True
-        #else:
-           #self.stall = False
            
         return None
         
@@ -101,26 +95,26 @@ class RandomWalk(Node):
         right_lidar_min = min(self.scan_cleaned[RIGHT_FRONT_INDEX:RIGHT_SIDE_INDEX])
         front_lidar_min = min(self.scan_cleaned[LEFT_FRONT_INDEX:RIGHT_FRONT_INDEX])
         
-
-        if self.pose_saved.x >= (self.start.x + 1):
-            self.cmd.linear.x = 0.0
+        # Check if it has reached it's goal
+        if self.pose_saved.x >= (self.start.x + 1): 
+            self.cmd.linear.x = 0.0 # Stop moving
             self.cmd.linear.z = 0.0
             self.publisher_.publish(self.cmd)
-            #actual = math.sqrt((self.pose_saved.x)** 2 + (self.pose_saved.y)**2)
-            current = math.sqrt((self.pose_saved.x - self.last_saved.x)** 2 + (self.pose_saved.y - self.last_saved.y)**2)
+            current = math.sqrt((self.pose_saved.x - self.last_saved.x)** 2 + (self.pose_saved.y - self.last_saved.y)**2) # Get final distance
             self.last_saved = self.pose_saved
             self.total_distance = self.total_distance + current
-            self.get_logger().info('Distance: "%s"' % self.total_distance)
+            self.get_logger().info('Estimated Distance: "%s"' % (self.pose_saved.x - self.start.x))
+            self.get_logger().info('Actual Distance: "%s"' % self.total_distance)
+            self.total_distance = 0 # Reset for next trial
+            self.start = self.pose_saved
         else:
-            self.cmd.linear.x = 0.075
+            self.cmd.linear.x = 0.075 # Move forward at trial speed
             self.cmd.linear.z = 0.0
             self.publisher_.publish(self.cmd)
             self.turtlebot_moving = True
-            current = math.sqrt((self.pose_saved.x - self.last_saved.x)** 2 + (self.pose_saved.y - self.last_saved.y)**2)
-            self.last_saved = self.pose_saved
-            self.total_distance = self.total_distance + current
-        # Display the message on the console
-        #self.get_logger().info('Publishing: "%s"' % self.cmd)
+            current = math.sqrt((self.pose_saved.x - self.last_saved.x)** 2 + (self.pose_saved.y - self.last_saved.y)**2) # Calculate actual distance
+            self.last_saved = self.pose_saved # Reset last saved
+            self.total_distance = self.total_distance + current # Add to total distance
  
 
 
