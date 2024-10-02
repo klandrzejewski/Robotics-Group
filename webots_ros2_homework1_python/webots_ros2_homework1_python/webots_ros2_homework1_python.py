@@ -102,7 +102,7 @@ class RandomWalk(Node):
         front_lidar_min = min(self.scan_cleaned[LEFT_FRONT_INDEX:RIGHT_FRONT_INDEX])
         
 
-        if self.pose_saved.x >= 1:
+        if self.pose_saved.x >= (self.start.x + 1):
             self.cmd.linear.x = 0.0
             self.cmd.linear.z = 0.0
             self.publisher_.publish(self.cmd)
