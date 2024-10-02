@@ -44,7 +44,7 @@ class RandomWalk(Node):
         self.laser_forward = 0
         self.odom_data = 0
         timer_period = 0.5
-        self.pose_saved= ''
+        self.pose_saved = None
         self.cmd = Twist()
         self.timer = self.create_timer(timer_period, self.timer_callback)
 
@@ -91,18 +91,20 @@ class RandomWalk(Node):
         left_lidar_min = min(self.scan_cleaned[LEFT_SIDE_INDEX:LEFT_FRONT_INDEX])
         right_lidar_min = min(self.scan_cleaned[RIGHT_FRONT_INDEX:RIGHT_SIDE_INDEX])
         front_lidar_min = min(self.scan_cleaned[LEFT_FRONT_INDEX:RIGHT_FRONT_INDEX])
+
         self.get_logger().info('Exists')
-        if self.pose_saved.x >= 1:
-            self.cmd.linear.x = 0.0
-            self.cmd.linear.z = 0.0
-            self.publisher_.publish(self.cmd)
-            actual = math.sqrt((self.pose_saved.x)** 2 + (self.pose_saved.y)**2)
-            self.get_logger().info('Distance: "%s"' % actual)
-        else:
-            self.cmd.linear.x = 0.075
-            self.cmd.linear.z = 0.0
-            self.publisher_.publish(self.cmd)
-            self.turtlebot_moving = True
+        if self.pose_saved is not None:
+            if self.pose_saved.x >= 1:
+                self.cmd.linear.x = 0.0
+                self.cmd.linear.z = 0.0
+                self.publisher_.publish(self.cmd)
+                actual = math.sqrt((self.pose_saved.x)** 2 + (self.pose_saved.y)**2)
+                self.get_logger().info('Distance: "%s"' % actual)
+            else:
+                self.cmd.linear.x = 0.075
+                self.cmd.linear.z = 0.0
+                self.publisher_.publish(self.cmd)
+                self.turtlebot_moving = True
         
         # Display the message on the console
         #self.get_logger().info('Publishing: "%s"' % self.cmd)
