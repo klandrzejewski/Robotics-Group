@@ -77,7 +77,7 @@ class RandomWalk(Node):
         self.pose_saved=position
 
         if self.start is None:
-            self.start = self.posed_saved
+            self.start = self.pose_saved
 
         if self.last_saved is None:
             self.last_saved = position
