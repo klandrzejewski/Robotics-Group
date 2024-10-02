@@ -96,9 +96,10 @@ class RandomWalk(Node):
         front_lidar_min = min(self.scan_cleaned[LEFT_FRONT_INDEX:RIGHT_FRONT_INDEX])
         
         # Check if it has reached it's goal
-        if self.pose_saved.x >= (self.start.x + 5): 
+        if self.pose_saved.x >= (self.start.x + 1): 
             self.cmd.linear.x = 0.0 # Stop moving
             self.cmd.linear.z = 0.0
+            #self.cmd.angular.z = 0.0
             self.publisher_.publish(self.cmd)
             current = math.sqrt((self.pose_saved.x - self.last_saved.x)** 2 + (self.pose_saved.y - self.last_saved.y)**2) # Get final distance
             self.last_saved = self.pose_saved
@@ -106,11 +107,13 @@ class RandomWalk(Node):
             self.get_logger().info('Estimated Distance: "%s"' % (self.pose_saved.x - self.start.x))
             self.get_logger().info('Actual Distance: "%s"' % self.total_distance)
             self.total_distance = 0 # Reset for next trial
-            self.start = self.pose_saved
+            #self.start = self.pose_saved
         else:
             #self.cmd.linear.x = 0.075 # Move forward at trial speed
             self.cmd.linear.x = 0.150 # Move forward at trial speed
+            #self.cmd.linear.x = 0.0 
             self.cmd.linear.z = 0.0
+            # self.cmd.angular.z = 0.3 # Turn at trial angle
             self.publisher_.publish(self.cmd)
             self.turtlebot_moving = True
             current = math.sqrt((self.pose_saved.x - self.last_saved.x)** 2 + (self.pose_saved.y - self.last_saved.y)**2) # Calculate actual distance
