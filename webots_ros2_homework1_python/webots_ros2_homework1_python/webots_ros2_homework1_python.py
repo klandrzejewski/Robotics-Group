@@ -1,101 +1,129 @@
 import rclpy
+# import the ROS2 python libraries
 from rclpy.node import Node
+# import the Twist module from geometry_msgs interface
 from geometry_msgs.msg import Twist
+# import the LaserScan module from sensor_msgs interface
 from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Odometry
+# import Quality of Service library, to set the correct profile and reliability in order to read sensor data.
 from rclpy.qos import ReliabilityPolicy, QoSProfile
 import math
-import time
+
+
+
+LINEAR_VEL = 0.22
+STOP_DISTANCE = 0.2
+LIDAR_ERROR = 0.05
+LIDAR_AVOID_DISTANCE = 0.7
+SAFE_STOP_DISTANCE = STOP_DISTANCE + LIDAR_ERROR
+RIGHT_SIDE_INDEX = 270
+RIGHT_FRONT_INDEX = 210
+LEFT_FRONT_INDEX=150
+LEFT_SIDE_INDEX=90
 
 class RandomWalk(Node):
 
     def __init__(self):
+        # Initialize the publisher
         super().__init__('random_walk_node')
+        self.scan_cleaned = []
+        self.stall = False
+        self.turtlebot_moving = False
         self.publisher_ = self.create_publisher(Twist, 'cmd_vel', 10)
-        self.subscriber_odom = self.create_subscription(
-            Odometry, '/odom', self.odom_callback, QoSProfile(depth=10, reliability=ReliabilityPolicy.BEST_EFFORT))
-        
-        self.odom_data = None
-        self.initial_pose = None
+        self.subscriber1 = self.create_subscription(
+            LaserScan,
+            '/scan',
+            self.listener_callback1,
+            QoSProfile(depth=10, reliability=ReliabilityPolicy.BEST_EFFORT))
+        self.subscriber2 = self.create_subscription(
+            Odometry,
+            '/odom',
+            self.listener_callback2,
+            QoSProfile(depth=10, reliability=ReliabilityPolicy.BEST_EFFORT))
+        self.laser_forward = 0
+        self.odom_data = 0
+        timer_period = 0.5
+        self.pose_saved=''
         self.cmd = Twist()
-        self.timer = self.create_timer(0.1, self.timer_callback)
-        self.test_running = False
-        self.test_phase = 0
-        self.movement_started_time = None
-        self.move_distance = 0
-        self.target_distance = 1.0  # Default to 1 meter
-        self.target_angle = 0.0  # Default no rotation
-        self.speed = 0.075  # Default speed
-        self.rotation_speed = 0.52  # Default angular speed
-        self.trial_count = 0
-        self.max_trials = 5
+        self.timer = self.create_timer(timer_period, self.timer_callback)
 
-    def odom_callback(self, msg):
-        position = msg.pose.pose.position
-        orientation = msg.pose.pose.orientation
-        self.odom_data = (position.x, position.y, orientation.z)
 
-    def start_movement(self, linear, angular, duration):
-        self.cmd.linear.x = linear
-        self.cmd.angular.z = angular
-        self.publisher_.publish(self.cmd)
-        self.movement_started_time = time.time()
-        self.test_running = True
-        self.get_logger().info(f"Started movement: linear={linear}, angular={angular}, duration={duration}s")
-
-    def stop_movement(self):
-        self.cmd.linear.x = 0.0
-        self.cmd.angular.z = 0.0
-        self.publisher_.publish(self.cmd)
-        self.test_running = False
-
-    def calculate_distance(self, start_pose, end_pose):
-        #Calculate linear distance between two positions."""
-        return math.sqrt((end_pose[0] - start_pose[0]) ** 2 + (end_pose[1] - start_pose[1]) ** 2)
-
-    def calculate_angle(self, start_orientation, end_orientation):
-        #Calculate angular difference."""
-        return abs(end_orientation - start_orientation)
-
-    def run_trial(self, distance, linear_speed, rotation_angle, rotation_speed):
-        # Run one trial of moving a specific distance or rotating by a specific angle."""
-        if distance > 0:
-            # Move forward
-            self.get_logger().info(f"Starting trial for distance: {distance}m at speed {linear_speed}m/s")
-            self.start_movement(linear_speed, 0.0, distance / linear_speed)
-        elif rotation_angle > 0:
-            # Rotate
-            self.get_logger().info(f"Starting trial for rotation: {rotation_angle} degrees at speed {rotation_speed} rad/s")
-            self.start_movement(0.0, rotation_speed, math.radians(rotation_angle) / rotation_speed)
-        self.initial_pose = self.odom_data
-
-    def timer_callback(self):
-        # Run the test sequence and log odometry error."""
-        if not self.test_running:
-            if self.trial_count < self.max_trials:
-                # Alternate between linear and rotational trials
-                if self.test_phase == 0:
-                    self.run_trial(self.target_distance, self.speed, 0, 0)
-                    self.test_phase = 1
-                elif self.test_phase == 1:
-                    self.run_trial(0, 0, 180, self.rotation_speed)
-                    self.test_phase = 0
-                self.trial_count += 1
+    def listener_callback1(self, msg1):
+        scan = msg1.ranges
+        self.scan_cleaned = []
+       
+        # Assume 360 range measurements
+        for reading in scan:
+            if reading == float('Inf'):
+                self.scan_cleaned.append(3.5)
+            elif math.isnan(reading):
+                self.scan_cleaned.append(0.0)
             else:
-                self.get_logger().info("Trials completed.")
+                self.scan_cleaned.append(reading)
+
+
+
+    def listener_callback2(self, msg2):
+        position = msg2.pose.pose.position
+        orientation = msg2.pose.pose.orientation
+        (posx, posy, posz) = (position.x, position.y, position.z)
+        (qx, qy, qz, qw) = (orientation.x, orientation.y, orientation.z, orientation.w)
+        self.get_logger().info('self position: {},{},{}'.format(posx,posy,posz));
+
+        self.pose_saved=position
+        
+        #Example of how to identify a stall..need better tuned position deltas; wheels spin and example fast
+        #diffX = math.fabs(self.pose_saved.x- position.x)
+        #diffY = math.fabs(self.pose_saved.y - position.y)
+        #if (diffX < 0.0001 and diffY < 0.0001):
+           #self.stall = True
+        #else:
+           #self.stall = False
+           
+        return None
+        
+    def timer_callback(self):
+        if (len(self.scan_cleaned)==0):
+            self.turtlebot_moving = False
+            return
+        
+        left_lidar_min = min(self.scan_cleaned[LEFT_SIDE_INDEX:LEFT_FRONT_INDEX])
+        right_lidar_min = min(self.scan_cleaned[RIGHT_FRONT_INDEX:RIGHT_SIDE_INDEX])
+        front_lidar_min = min(self.scan_cleaned[LEFT_FRONT_INDEX:RIGHT_FRONT_INDEX])
+
+        if self.posed_saved.x >= 1:
+            self.cmd.linear.x = 0
+            self.cmd.linear.z = 0.0
+            self.publisher_.publish(self.cmd)
+            actual = math.sqrt((self.posed_saved.x)** 2 + (self.posed_saved.y)**2)
+            self.get_logger().info('Distance: "%s"' % actual)
         else:
-            # Stop movement after the duration has passed
-            if time.time() - self.movement_started_time > self.target_distance / self.speed:
-                self.stop_movement()
-                actual_distance = self.calculate_distance(self.initial_pose, self.odom_data)
-                self.get_logger().info(f"Trial completed. Actual distance: {actual_distance}, Odometry reported: {self.target_distance}")
+            self.cmd.linear.x = 0.075
+            self.cmd.linear.z = 0.0
+            self.publisher_.publish(self.cmd)
+            self.turtlebot_moving = True
+        
+        self.get_logger().info(self.pose_saved)
+        
+        # Display the message on the console
+        #self.get_logger().info('Publishing: "%s"' % self.cmd)
+ 
+
 
 def main(args=None):
+    # initialize the ROS communication
     rclpy.init(args=args)
+    # declare the node constructor
     random_walk_node = RandomWalk()
+    # pause the program execution, waits for a request to kill the node (ctrl+c)
     rclpy.spin(random_walk_node)
+    # Explicity destroy the node
     random_walk_node.destroy_node()
+    # shutdown the ROS communication
     rclpy.shutdown()
+
+
 
 if __name__ == '__main__':
     main()
