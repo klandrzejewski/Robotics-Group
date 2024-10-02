@@ -92,7 +92,7 @@ class RandomWalk(Node):
         right_lidar_min = min(self.scan_cleaned[RIGHT_FRONT_INDEX:RIGHT_SIDE_INDEX])
         front_lidar_min = min(self.scan_cleaned[LEFT_FRONT_INDEX:RIGHT_FRONT_INDEX])
         self.get_logger().info('Exists')
-        if self.pose_saved.x >= 1:
+        if self.pose_saved.x >= 1.0:
             self.cmd.linear.x = 0
             self.cmd.linear.z = 0.0
             self.publisher_.publish(self.cmd)
@@ -103,7 +103,6 @@ class RandomWalk(Node):
             self.cmd.linear.z = 0.0
             self.publisher_.publish(self.cmd)
             self.turtlebot_moving = True
-    
         
         # Display the message on the console
         #self.get_logger().info('Publishing: "%s"' % self.cmd)
