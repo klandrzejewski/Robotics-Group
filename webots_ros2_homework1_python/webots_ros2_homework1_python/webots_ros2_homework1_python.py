@@ -92,11 +92,11 @@ class RandomWalk(Node):
         right_lidar_min = min(self.scan_cleaned[RIGHT_FRONT_INDEX:RIGHT_SIDE_INDEX])
         front_lidar_min = min(self.scan_cleaned[LEFT_FRONT_INDEX:RIGHT_FRONT_INDEX])
         self.get_logger().info('Exists')
-        if self.posed_saved.x >= 1:
+        if self.pose_saved.x >= 1:
             self.cmd.linear.x = 0
             self.cmd.linear.z = 0.0
             self.publisher_.publish(self.cmd)
-            actual = math.sqrt((self.posed_saved.x)** 2 + (self.posed_saved.y)**2)
+            actual = math.sqrt((self.pose_saved.x)** 2 + (self.pose_saved.y)**2)
             self.get_logger().info('Distance: "%s"' % actual)
         else:
             self.cmd.linear.x = 0.075
