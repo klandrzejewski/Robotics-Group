@@ -44,7 +44,7 @@ class RandomWalk(Node):
         self.laser_forward = 0
         self.odom_data = 0
         timer_period = 0.5
-        self.pose_saved=''
+        self.pose_saved= None
         self.cmd = Twist()
         self.timer = self.create_timer(timer_period, self.timer_callback)
 
