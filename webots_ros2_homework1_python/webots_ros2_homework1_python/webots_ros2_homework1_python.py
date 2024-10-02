@@ -103,8 +103,7 @@ class RandomWalk(Node):
             self.cmd.linear.z = 0.0
             self.publisher_.publish(self.cmd)
             self.turtlebot_moving = True
-        
-        self.get_logger().info(self.pose_saved)
+    
         
         # Display the message on the console
         #self.get_logger().info('Publishing: "%s"' % self.cmd)
@@ -127,3 +126,4 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
+    
