@@ -49,6 +49,7 @@ class RandomWalk(Node):
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.total_distance = 0
         self.last_saved = None
+        self.start = None
 
 
     def listener_callback1(self, msg1):
@@ -74,6 +75,9 @@ class RandomWalk(Node):
         #self.get_logger().info('self position: {},{},{}'.format(posx,posy,posz));
 
         self.pose_saved=position
+
+        if self.start is None:
+            self.start = self.posed_saved
 
         if self.last_saved is None:
             self.last_saved = position
