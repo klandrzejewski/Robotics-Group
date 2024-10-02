@@ -108,7 +108,8 @@ class RandomWalk(Node):
             self.total_distance = 0 # Reset for next trial
             self.start = self.pose_saved
         else:
-            self.cmd.linear.x = 0.075 # Move forward at trial speed
+            #self.cmd.linear.x = 0.075 # Move forward at trial speed
+            self.cmd.linear.x = 0.150 # Move forward at trial speed
             self.cmd.linear.z = 0.0
             self.publisher_.publish(self.cmd)
             self.turtlebot_moving = True
