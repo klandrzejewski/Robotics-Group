@@ -121,7 +121,7 @@ class RandomWalk(Node):
         if abs(yaw_diff) >= 3.14159:
             self.halfway = True
         self.get_logger().info('Yaw current: {} radians'.format(yaw_diff)) 
-        if yaw_diff >= 0.0 and self.halfway is True:  # If the robot has rotated by trial degrees
+        if abs(yaw_diff) < 0.3 and self.halfway is True:  # If the robot has rotated by trial degrees
             self.cmd.angular.z = 0.0  # Stop rotating
             self.publisher_.publish(self.cmd)
             self.get_logger().info('Yaw difference: {} radians'.format(yaw_diff))
