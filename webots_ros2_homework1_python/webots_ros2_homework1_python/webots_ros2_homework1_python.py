@@ -120,7 +120,9 @@ class RandomWalk(Node):
         # 360 degrees = 6.2831
         if abs(yaw_diff) >= 3.14159:
             self.halfway = True
-        self.get_logger().info('Yaw current: {} radians'.format(yaw_diff)) 
+
+        #self.get_logger().info('Yaw current: {} radians'.format(yaw_diff)) 
+        # if abs(yaw_diff) >= :
         if (yaw_diff >= 0.0 or abs(yaw_diff) < 0.1)   and self.halfway is True:  # If the robot has rotated by trial degrees
             self.cmd.angular.z = 0.0  # Stop rotating
             self.publisher_.publish(self.cmd)
@@ -143,8 +145,8 @@ class RandomWalk(Node):
             #self.cmd.linear.x = 0.150 # Move forward at trial speed
             self.cmd.linear.x = 0.0 
             #self.cmd.linear.z = 0.0
-            self.cmd.angular.z = 0.5236 # Turn at trial angle (30)
-            #self.cmd.angular.z = 2.094 # Turn at trial angle (120)
+            #self.cmd.angular.z = 0.5236 # Turn at trial angle (30)
+            self.cmd.angular.z = 2.094 # Turn at trial angle (120)
             self.publisher_.publish(self.cmd)
             self.turtlebot_moving = True
 
