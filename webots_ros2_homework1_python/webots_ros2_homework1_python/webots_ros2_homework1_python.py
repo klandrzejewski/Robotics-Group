@@ -9,7 +9,6 @@ from nav_msgs.msg import Odometry
 # import Quality of Service library, to set the correct profile and reliability in order to read sensor data.
 from rclpy.qos import ReliabilityPolicy, QoSProfile
 import math
-import tf_transformations as tf
 
 
 
@@ -78,10 +77,13 @@ class RandomWalk(Node):
 
         self.pose_saved=position
 
-        # Convert quaternion to Euler angles to get the yaw (Z-axis rotation)
-        quaternion = (orientation.x, orientation.y, orientation.z, orientation.w)
-        euler = tf.euler_from_quaternion(quaternion)
-        yaw = euler[2]
+        # Convert quaternion to yaw
+        x = orientation.x
+        y = orientation.y
+        z = orientation.z
+        w = orientation.w
+
+        yaw = math.atan2(2.0 * (w * z + x * y), 1.0 - 2.0 * (y * y + z * z))
 
         self.current_yaw = yaw
 
