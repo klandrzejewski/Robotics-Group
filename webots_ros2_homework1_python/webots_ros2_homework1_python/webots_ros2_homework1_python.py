@@ -9,6 +9,7 @@ from nav_msgs.msg import Odometry
 # import Quality of Service library, to set the correct profile and reliability in order to read sensor data.
 from rclpy.qos import ReliabilityPolicy, QoSProfile
 import math
+import tf_transformations as tf
 
 
 
@@ -45,6 +46,7 @@ class RandomWalk(Node):
         self.odom_data = 0
         timer_period = 0.5
         self.pose_saved = None
+        self.start_yaw = None
         self.cmd = Twist()
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.total_distance = 0
@@ -76,12 +78,22 @@ class RandomWalk(Node):
 
         self.pose_saved=position
 
+        # Convert quaternion to Euler angles to get the yaw (Z-axis rotation)
+        quaternion = (orientation.x, orientation.y, orientation.z, orientation.w)
+        euler = tf.euler_from_quaternion(quaternion)
+        yaw = euler[2]
+
+        self.current_yaw = yaw
+
         # Initialize
         if self.start is None:
             self.start = self.pose_saved
 
         if self.last_saved is None:
             self.last_saved = position
+        
+        if self.start_yaw is None:
+            self.start_yaw = yaw
         
            
         return None
@@ -96,26 +108,39 @@ class RandomWalk(Node):
         front_lidar_min = min(self.scan_cleaned[LEFT_FRONT_INDEX:RIGHT_FRONT_INDEX])
         
         # Check if it has reached it's goal
-        if self.pose_saved.x >= (self.start.x + 1): 
-            self.cmd.linear.x = 0.0 # Stop moving
-            self.cmd.linear.z = 0.0
-            #self.cmd.angular.z = 0.0
+        # Compute the yaw difference between the current orientation and starting orientation
+        yaw_diff = self.current_yaw - self.start_yaw
+
+        # Normalize the yaw difference to the range [-pi, pi]
+        yaw_diff = math.atan2(math.sin(yaw_diff), math.cos(yaw_diff))
+
+        # Convert 10 degrees to radians (~0.1745 rad)
+        if abs(yaw_diff) >= 0.1745:  # If the robot has rotated by 10 degrees
+            self.cmd.angular.z = 0.0  # Stop rotating
             self.publisher_.publish(self.cmd)
-            current = math.sqrt((self.pose_saved.x - self.last_saved.x)** 2 + (self.pose_saved.y - self.last_saved.y)**2) # Get final distance
-            self.last_saved = self.pose_saved
-            self.total_distance = self.total_distance + current
-            self.get_logger().info('Estimated Distance: "%s"' % (self.pose_saved.x - self.start.x))
-            self.get_logger().info('Actual Distance: "%s"' % self.total_distance)
-            self.total_distance = 0 # Reset for next trial
-            #self.start = self.pose_saved
+            self.get_logger().info('Rotation complete: yaw difference is {} radians'.format(yaw_diff))
+        # if self.pose_saved.x >= (self.start.x + 1): 
+        #     self.cmd.linear.x = 0.0 # Stop moving
+        #     self.cmd.linear.z = 0.0
+        #     self.cmd.angular.z = 0.0
+        #     self.publisher_.publish(self.cmd)
+
+        #     current = math.sqrt((self.pose_saved.x - self.last_saved.x)** 2 + (self.pose_saved.y - self.last_saved.y)**2) # Get final distance
+        #     self.last_saved = self.pose_saved
+        #     self.total_distance = self.total_distance + current
+        #     self.get_logger().info('Estimated Distance: "%s"' % (self.pose_saved.x - self.start.x))
+        #     self.get_logger().info('Actual Distance: "%s"' % self.total_distance)
+        #     self.total_distance = 0 # Reset for next trial
+        #     #self.start = self.pose_saved
         else:
             #self.cmd.linear.x = 0.075 # Move forward at trial speed
-            self.cmd.linear.x = 0.150 # Move forward at trial speed
-            #self.cmd.linear.x = 0.0 
-            self.cmd.linear.z = 0.0
-            # self.cmd.angular.z = 0.3 # Turn at trial angle
+            #self.cmd.linear.x = 0.150 # Move forward at trial speed
+            self.cmd.linear.x = 0.0 
+            #self.cmd.linear.z = 0.0
+            self.cmd.angular.z = 0.5236 # Turn at trial angle
             self.publisher_.publish(self.cmd)
             self.turtlebot_moving = True
+
             current = math.sqrt((self.pose_saved.x - self.last_saved.x)** 2 + (self.pose_saved.y - self.last_saved.y)**2) # Calculate actual distance
             self.last_saved = self.pose_saved # Reset last saved
             self.total_distance = self.total_distance + current # Add to total distance
