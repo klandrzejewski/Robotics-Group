@@ -110,15 +110,15 @@ class RandomWalk(Node):
         front_lidar_min = min(self.scan_cleaned[LEFT_FRONT_INDEX:RIGHT_FRONT_INDEX])
         
         # Check if it has reached it's goal
-        
+
         # Compute the yaw difference between the current orientation and starting orientation
         yaw_diff = self.current_yaw - self.start_yaw
 
         # 10 degrees = 0.1745 radians
         # 180 degrees = 3.14159 radians
         # 360 degrees = 6.2831
-    
-        if abs(yaw_diff) >= 6.2831:  # If the robot has rotated by trial degrees
+        self.get_logger().info('Yaw current: {} radians'.format(yaw_diff))
+        if abs(yaw_diff) >= 3.14159:  # If the robot has rotated by trial degrees
             self.cmd.angular.z = 0.0  # Stop rotating
             self.publisher_.publish(self.cmd)
             self.get_logger().info('Yaw difference: {} radians'.format(yaw_diff))
