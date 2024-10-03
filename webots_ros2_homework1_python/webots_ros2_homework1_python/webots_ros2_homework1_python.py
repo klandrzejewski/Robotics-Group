@@ -139,7 +139,8 @@ class RandomWalk(Node):
             #self.cmd.linear.x = 0.150 # Move forward at trial speed
             self.cmd.linear.x = 0.0 
             #self.cmd.linear.z = 0.0
-            self.cmd.angular.z = 0.5236 # Turn at trial angle
+            #self.cmd.angular.z = 0.5236 # Turn at trial angle
+            self.cmd.angular.z = 2.094 # Turn at trial angle
             self.publisher_.publish(self.cmd)
             self.turtlebot_moving = True
 
