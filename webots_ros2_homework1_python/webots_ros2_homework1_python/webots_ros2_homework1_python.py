@@ -118,6 +118,7 @@ class RandomWalk(Node):
 
         # 10 degrees = 0.1745 radians
         # 180 degrees = 3.14159 radians
+        self.get_logger().info('Yaw difference: {} radians'.format(yaw_diff))
         if abs(yaw_diff) >= 3.13:  # If the robot has rotated by trial degrees
             self.cmd.angular.z = 0.0  # Stop rotating
             self.publisher_.publish(self.cmd)
