@@ -116,8 +116,9 @@ class RandomWalk(Node):
         # Normalize the yaw difference to the range [-pi, pi]
         yaw_diff = math.atan2(math.sin(yaw_diff), math.cos(yaw_diff))
 
-        # Convert 10 degrees to radians (~0.1745 rad)
-        if abs(yaw_diff) >= 0.1745:  # If the robot has rotated by 10 degrees
+        # 10 degrees = 0.1745 radians
+        # 180 degrees = 3.14159 radians
+        if abs(yaw_diff) >= 3.14159:  # If the robot has rotated by trial degrees
             self.cmd.angular.z = 0.0  # Stop rotating
             self.publisher_.publish(self.cmd)
             self.get_logger().info('Yaw difference: {} radians'.format(yaw_diff))
@@ -139,8 +140,8 @@ class RandomWalk(Node):
             #self.cmd.linear.x = 0.150 # Move forward at trial speed
             self.cmd.linear.x = 0.0 
             #self.cmd.linear.z = 0.0
-            #self.cmd.angular.z = 0.5236 # Turn at trial angle
-            self.cmd.angular.z = 2.094 # Turn at trial angle
+            #self.cmd.angular.z = 0.5236 # Turn at trial angle (30)
+            self.cmd.angular.z = 2.094 # Turn at trial angle (120)
             self.publisher_.publish(self.cmd)
             self.turtlebot_moving = True
 
