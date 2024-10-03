@@ -120,7 +120,7 @@ class RandomWalk(Node):
         if abs(yaw_diff) >= 0.1745:  # If the robot has rotated by 10 degrees
             self.cmd.angular.z = 0.0  # Stop rotating
             self.publisher_.publish(self.cmd)
-            self.get_logger().info('Rotation complete: yaw difference is {} radians'.format(yaw_diff))
+            self.get_logger().info('Yaw difference: {} radians'.format(yaw_diff))
         # if self.pose_saved.x >= (self.start.x + 1): 
         #     self.cmd.linear.x = 0.0 # Stop moving
         #     self.cmd.linear.z = 0.0
