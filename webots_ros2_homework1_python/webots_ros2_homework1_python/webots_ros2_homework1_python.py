@@ -127,6 +127,7 @@ class RandomWalk(Node):
         #     self.cmd.angular.z = 0.0  # Stop rotating
         #     self.publisher_.publish(self.cmd)
         #     self.get_logger().info('Yaw difference: {} radians'.format(yaw_diff))
+        self.get_logger().info('Exists')
         if self.pose_saved.x >= (self.start.x + 1): 
             self.cmd.linear.x = 0.0 # Stop moving
             self.cmd.linear.z = 0.0
