@@ -144,8 +144,8 @@ class RandomWalk(Node):
         else:
             self.cmd.linear.x = 0.075 # Move forward at trial speed
             #self.cmd.linear.x = 0.150 # Move forward at trial speed
-            self.cmd.linear.x = 0.0 
-            #self.cmd.linear.z = 0.0
+            #self.cmd.linear.z = 0.0 
+            self.cmd.linear.z = 0.0
             #self.cmd.angular.z = 0.5236 # Turn at trial angle (30)
             #self.cmd.angular.z = 2.094 # Turn at trial angle (120)
             self.publisher_.publish(self.cmd)
