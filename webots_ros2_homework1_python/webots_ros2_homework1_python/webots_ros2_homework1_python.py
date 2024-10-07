@@ -79,14 +79,14 @@ class RandomWalk(Node):
         self.pose_saved=position
 
         # Convert quaternion to yaw
-        # x = orientation.x
-        # y = orientation.y
-        # z = orientation.z
-        # w = orientation.w
+        x = orientation.x
+        y = orientation.y
+        z = orientation.z
+        w = orientation.w
 
-        # yaw = math.atan2(2.0 * (w * z + x * y), 1.0 - 2.0 * (y * y + z * z))
+        yaw = math.atan2(2.0 * (w * z + x * y), 1.0 - 2.0 * (y * y + z * z))
 
-        # self.current_yaw = yaw
+        self.current_yaw = yaw
 
         # Initialize
         if self.start is None:
@@ -95,8 +95,8 @@ class RandomWalk(Node):
         if self.last_saved is None:
             self.last_saved = position
         
-        # if self.start_yaw is None:
-        #     self.start_yaw = yaw
+        if self.start_yaw is None:
+            self.start_yaw = yaw
         
            
         return None
@@ -113,40 +113,40 @@ class RandomWalk(Node):
         # Check if it has reached it's goal
 
         # Compute the yaw difference between the current orientation and starting orientation
-        # yaw_diff = self.current_yaw - self.start_yaw
+        yaw_diff = self.current_yaw - self.start_yaw
 
         # # 10 degrees = 0.1745 radians
         # # 180 degrees = 3.14159 radians
         # # 360 degrees = 6.2831
-        # if abs(yaw_diff) >= 3.14159:
-        #     self.halfway = True
+        if abs(yaw_diff) >= 3.14159:
+            self.halfway = True
 
         #self.get_logger().info('Yaw current: {} radians'.format(yaw_diff)) 
         # if abs(yaw_diff) >= :
-        # if (yaw_diff >= 0.0 or abs(yaw_diff) < 0.1)   and self.halfway is True:  # If the robot has rotated by trial degrees
-        #     self.cmd.angular.z = 0.0  # Stop rotating
-        #     self.publisher_.publish(self.cmd)
-        #     self.get_logger().info('Yaw difference: {} radians'.format(yaw_diff))
-        self.get_logger().info('Exists')
-        if self.pose_saved.x >= (self.start.x + 1): 
-            self.cmd.linear.x = 0.0 # Stop moving
-            self.cmd.linear.z = 0.0
-            self.cmd.angular.z = 0.0
+        if (yaw_diff >= 0.0 or abs(yaw_diff) < 0.1)   and self.halfway is True:  # If the robot has rotated by trial degrees
+            self.cmd.angular.z = 0.0  # Stop rotating
             self.publisher_.publish(self.cmd)
+            self.get_logger().info('Yaw difference: {} radians'.format(yaw_diff))
 
-            current = math.sqrt((self.pose_saved.x - self.last_saved.x)** 2 + (self.pose_saved.y - self.last_saved.y)**2) # Get final distance
-            self.last_saved = self.pose_saved
-            self.total_distance = self.total_distance + current
-            self.get_logger().info('Estimated Distance: "%s"' % (self.pose_saved.x - self.start.x))
-            self.get_logger().info('Actual Distance: "%s"' % self.total_distance)
-            self.total_distance = 0 # Reset for next trial
-            #self.start = self.pose_saved
+        # if self.pose_saved.x >= (self.start.x + 1): 
+        #     self.cmd.linear.x = 0.0 # Stop moving
+        #     self.cmd.linear.z = 0.0
+        #     self.cmd.angular.z = 0.0
+        #     self.publisher_.publish(self.cmd)
+
+        #     current = math.sqrt((self.pose_saved.x - self.last_saved.x)** 2 + (self.pose_saved.y - self.last_saved.y)**2) # Get final distance
+        #     self.last_saved = self.pose_saved
+        #     self.total_distance = self.total_distance + current
+        #     self.get_logger().info('Estimated Distance: "%s"' % (self.pose_saved.x - self.start.x))
+        #     self.get_logger().info('Actual Distance: "%s"' % self.total_distance)
+        #     self.total_distance = 0 # Reset for next trial
+        #     #self.start = self.pose_saved
         else:
-            self.cmd.linear.x = 0.075 # Move forward at trial speed
+            #self.cmd.linear.x = 0.075 # Move forward at trial speed
             #self.cmd.linear.x = 0.150 # Move forward at trial speed
-            #self.cmd.linear.z = 0.0 
-            self.cmd.linear.z = 0.0
-            #self.cmd.angular.z = 0.5236 # Turn at trial angle (30)
+            self.cmd.linear.x = 0.0 
+            #self.cmd.linear.z = 0.0
+            self.cmd.angular.z = 0.5236 # Turn at trial angle (30)
             #self.cmd.angular.z = 2.094 # Turn at trial angle (120)
             self.publisher_.publish(self.cmd)
             self.turtlebot_moving = True
