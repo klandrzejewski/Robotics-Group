@@ -158,11 +158,11 @@ class WallWalker(Node):
             self.publisher_.publish(self.cmd)
             self.get_logger().info('Turning to avoid front obstacle')
             self.turtlebot_moving = True
-        elif self.rotate and self.rotateTime < current_time - 7:
+        elif self.rotate and self.rotateTime < current_time - 8:
             self.cmd.linear.x = 0.0  
             self.cmd.angular.z = 1.0  # Turn left away from wall
             self.publisher_.publish(self.cmd)
-            if self.rotateTime < current_time - 9:
+            if self.rotateTime < current_time - 10:
                 self.rotate = False
                 self.rotateTime = time.time()
             self.get_logger().info('Looking for tags')
