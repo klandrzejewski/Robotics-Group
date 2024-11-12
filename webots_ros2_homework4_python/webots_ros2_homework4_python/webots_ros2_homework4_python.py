@@ -33,6 +33,8 @@ class WallWalker(Node):
         self.time_stationary = 0.0  # Time spent stationary
         self.last_move_time = time.time()  # Record the last move time
         self.time_last_wall = 0.0 # Time since last found wall
+        self.rotateTime = time.time()
+        self.rotate = False
         self.turtlebot_moving = False
         self.publisher_ = self.create_publisher(Twist, 'cmd_vel', 10)
         self.subscriber1 = self.create_subscription(
@@ -89,8 +91,8 @@ class WallWalker(Node):
             if self.timer_pos is not None:
                 timerDiffX = math.fabs(self.timer_pos.x - self.current_pos.x)
                 timerDiffY = math.fabs(self.timer_pos.y - self.current_pos.y)
-                if timerDiffX < 0.01 and timerDiffY < 0.01:
-                    self.time_stationary = 6
+                #if timerDiffX < 0.01 and timerDiffY < 0.01:
+                    #self.time_stationary = 6
             self.timer_pos = self.current_pos
 
     def timer_callback(self):
@@ -115,7 +117,17 @@ class WallWalker(Node):
             self.found_wall = False
         
         # Check robot status
-        if self.stall:
+        if self.rotate:
+            self.cmd.linear.x = 0.0  
+            self.cmd.angular.z = 1.0  # Turn left away from wall
+            self.publisher_.publish(self.cmd)
+            self.rotate = False
+        elif self.rotateTime < current_time - 5:
+            self.cmd.linear.x = 0.0  
+            self.cmd.angular.z = -1.0  # Turn right towards wall
+            self.publisher_.publish(self.cmd)
+            self.rotate = True
+        elif self.stall:
             self.cmd.linear.x = -0.5  # Reverse to recover from stall
             self.cmd.angular.z = 0.0
             self.publisher_.publish(self.cmd)
