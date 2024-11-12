@@ -143,7 +143,7 @@ class WallWalker(Node):
             self.last_move_time = time.time()
             self.stall = True  # Reset stall flag
             self.recovery = True # Set recovery flag
-        elif front_lidar_min < LIDAR_AVOID_DISTANCE:
+        elif front_lidar_min < LIDAR_AVOID_DISTANCE and self.rotate == False:
             # Obstacle in front: slow down and turn
             self.cmd.linear.x = 0.07
             if right_lidar_min > SAFE_STOP_DISTANCE + 0.3 and self.found_wall == True and self.start == False: # Needs to turn, but follow the wall
@@ -158,7 +158,7 @@ class WallWalker(Node):
             self.publisher_.publish(self.cmd)
             self.get_logger().info('Turning to avoid front obstacle')
             self.turtlebot_moving = True
-        elif self.rotate:
+        elif self.rotate and self.rotateTime < current_time - 9:
             self.cmd.linear.x = 0.0  
             self.cmd.angular.z = 1.0  # Turn left away from wall
             self.publisher_.publish(self.cmd)
