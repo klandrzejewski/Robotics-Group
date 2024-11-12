@@ -153,6 +153,7 @@ class WallWalker(Node):
                 self.cmd.angular.z = 0.5  # Turn left
                 if self.start == True:
                     self.rotateTime = current_time
+                    self.found_wall = False
                 self.start = False
             self.publisher_.publish(self.cmd)
             self.get_logger().info('Turning to avoid front obstacle')
