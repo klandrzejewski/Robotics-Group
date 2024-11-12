@@ -145,9 +145,8 @@ class WallWalker(Node):
             self.recovery = True # Set recovery flag
         elif front_lidar_min < LIDAR_AVOID_DISTANCE:
             # Obstacle in front: slow down and turn
-            self.start = False
             self.cmd.linear.x = 0.07
-            if right_lidar_min > SAFE_STOP_DISTANCE + 0.3 and self.found_wall == True and not self.start: # Needs to turn, but follow the wall
+            if right_lidar_min > SAFE_STOP_DISTANCE + 0.3 and self.found_wall == True and self.start == False: # Needs to turn, but follow the wall
                 self.cmd.angular.z = -0.5  # Turn right
                 self.time_last_wall = current_time
             else:
