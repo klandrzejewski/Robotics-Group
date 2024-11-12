@@ -122,7 +122,8 @@ class WallWalker(Node):
             self.cmd.angular.z = 1.0  # Turn left away from wall
             self.publisher_.publish(self.cmd)
             self.rotate = False
-        elif self.rotateTime < current_time - 5:
+            self.rotateTime = time.time()
+        elif self.rotateTime < current_time - 5 and self.found_wall:
             self.cmd.linear.x = 0.0  
             self.cmd.angular.z = -1.0  # Turn right towards wall
             self.publisher_.publish(self.cmd)
