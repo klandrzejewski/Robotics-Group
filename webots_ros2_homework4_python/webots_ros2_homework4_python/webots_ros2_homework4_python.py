@@ -59,7 +59,7 @@ class WallWalker(Node):
         scan = msg1.ranges
         self.scan_cleaned = []
         for reading in scan:
-            if reading == float('Inf'):
+            if reading == float(0.0):
                 self.scan_cleaned.append(3.5)
             elif math.isnan(reading):
                 self.scan_cleaned.append(0.0)
@@ -106,7 +106,8 @@ class WallWalker(Node):
         # Get lidar readings
         left_lidar_min = min(self.scan_cleaned[LEFT_SIDE_INDEX:LEFT_FRONT_INDEX])
         right_lidar_min = min(self.scan_cleaned[RIGHT_FRONT_INDEX:RIGHT_SIDE_INDEX])
-        front_lidar_min = min(self.scan_cleaned[LEFT_FRONT_INDEX:RIGHT_FRONT_INDEX])
+        #front_lidar_min = min(self.scan_cleaned[LEFT_FRONT_INDEX:RIGHT_FRONT_INDEX])
+        front_lidar_min = min(self.scan_cleaned[330:] + self.scan_cleaned[0:30])
         
         # Wall-following logic
         
