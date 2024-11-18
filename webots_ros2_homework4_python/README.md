@@ -8,6 +8,14 @@ To begin, the robot will try to identify a wall on its right side or will procee
 #### Search for April Tags
 To find the april tags, the robot will search the wall every few seconds to see if there are any tags to be found in the area. To accomplish this, the robot holds a timer of the last time it has rotated to search for the tags. Once it has been 5 seconds since it last searched and the robot has identified it is near a wall or has recently been near the wall, the robot will turn right -1.0 to search the wall. After three seconds has passed of it turning right, the robot will turn back left 1.0 for 2 seconds to return to its starting position and reset the last rotation time. This allows the entire area of the wall around the robot to be searched. With the area being searched for the april tags, the robot will resume its wall following algorithm until it is prompted to search again.
 
+#### April Nodes
+
+The following nodes are needed to identify the tags:
+ros2 run v4l2_camera v4l2_camera_node
+ros2 run apriltag_ros apriltag_node --ros-args -r image_rect:=/image_raw -r camera_info:=/camera_info --params-file  `ros2 pkg prefix apriltag_ros`/cfg/tags_36h11.yaml
+ros2 run rqt_image_view rqt_image_view
+ros2 topic echo /detections
+
 ### TO INSTALL PACKAGE FOR ASSIGNMENT - From monicadelaine/f24_robotics Github
 
 1. Set up environment variables for ROS. Make sure to replace '/home/rpi/shared' with your own shared folder location
