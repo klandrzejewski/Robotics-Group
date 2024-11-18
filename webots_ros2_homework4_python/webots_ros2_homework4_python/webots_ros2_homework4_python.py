@@ -119,6 +119,7 @@ class WallWalker(Node):
             self.found_wall = False
         
         # Check robot status
+        # Comment out stall recovery
         # if self.stall:
         #     self.cmd.linear.x = -0.5  # Reverse to recover from stall
         #     self.cmd.angular.z = 0.0
@@ -160,6 +161,7 @@ class WallWalker(Node):
             self.get_logger().info('Turning to avoid front obstacle')
             self.turtlebot_moving = True
         elif self.rotate and self.rotateTime < current_time - 8:
+            # Rotate back from looking for tags
             self.cmd.linear.x = 0.0  
             self.cmd.angular.z = 1.0  # Turn left away from wall
             self.publisher_.publish(self.cmd)
@@ -168,12 +170,13 @@ class WallWalker(Node):
                 self.rotateTime = time.time()
             self.get_logger().info('Looking for tags')
         elif self.rotateTime < current_time - 5 and (self.found_wall or right_lidar_min < SAFE_STOP_DISTANCE + 0.5) and not self.start:
+            # Start looking for april tags
             self.cmd.linear.x = 0.0  
             self.cmd.angular.z = -1.0  # Turn right towards wall
             self.publisher_.publish(self.cmd)
             self.get_logger().info('Looking for tags')
             self.rotate = True
-        else:
+        elif self.rotate == False:
             # Space in front, follow the wall on the right side
             if right_lidar_min < SAFE_STOP_DISTANCE:
                 # Robot is too close to the right wall, turn left slightly
