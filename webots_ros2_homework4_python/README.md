@@ -1,4 +1,4 @@
-# Homework 4 ROS2 
+# Homework 4 ROS2 - April Tag Search
 
 This package includes the controller and launch file for Homework 4 in CS 460/560, the april tag search. The controller utilizes a wall following method to complete its search for april tags. The robot uses its right lidar readings to maneuver the room and determine if it is too close or far from the wall and will adjust accordingly. 
 
