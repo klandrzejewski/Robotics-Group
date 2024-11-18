@@ -25,7 +25,7 @@ For example in windows...
 export WEBOTS_HOME=/mnt/c/Program\ Files/Webots
 </pre>
 
-2. Fork your own repository of f23_robotics (using web interface)
+2. Fork your own repository of Robotics-Group (using web interface)
 
 3. Clone your fork
 <pre>
@@ -34,7 +34,7 @@ git clone <your github url for this repository>
 
 4. Make the package (for python, it really just installs the files
 <pre>
-cd f24_robotics
+cd Robotics-Group
 colcon build
 </pre>
 
