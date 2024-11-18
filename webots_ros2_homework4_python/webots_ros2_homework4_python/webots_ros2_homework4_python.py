@@ -8,7 +8,7 @@ import math
 import time
 import csv
 
-LINEAR_VEL = 0.22
+LINEAR_VEL = 0.14
 STOP_DISTANCE = 0.2
 LIDAR_ERROR = 0.05
 LIDAR_AVOID_DISTANCE = 0.7
@@ -178,14 +178,14 @@ class WallWalker(Node):
             if right_lidar_min < SAFE_STOP_DISTANCE:
                 # Robot is too close to the right wall, turn left slightly
                 self.start = False
-                self.cmd.linear.x = 0.10
+                self.cmd.linear.x = 0.14
                 self.cmd.angular.z = 0.1
                 self.get_logger().info('Too close to wall, adjusting left')
                 self.found_wall = True
                 self.time_last_wall = current_time
             elif (right_lidar_min > SAFE_STOP_DISTANCE + 0.2 and not self.start) or (right_lidar_min < SAFE_STOP_DISTANCE + 0.5 and self.start):
                 # Robot is too far from the right wall, turn right slightly
-                self.cmd.linear.x = 0.10
+                self.cmd.linear.x = 0.14
                 self.cmd.angular.z = -0.18
                 self.get_logger().info('Too far from wall, adjusting right')
                 #self.found_wall == False
