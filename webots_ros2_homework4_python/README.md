@@ -11,10 +11,10 @@ To find the april tags, the robot will search the wall every few seconds to see 
 #### April Nodes
 
 The following nodes are needed to identify the tags:
-ros2 run v4l2_camera v4l2_camera_node
-ros2 run apriltag_ros apriltag_node --ros-args -r image_rect:=/image_raw -r camera_info:=/camera_info --params-file  `ros2 pkg prefix apriltag_ros`/cfg/tags_36h11.yaml
-ros2 run rqt_image_view rqt_image_view
-ros2 topic echo /detections
+- ros2 run v4l2_camera v4l2_camera_node
+- ros2 run apriltag_ros apriltag_node --ros-args -r image_rect:=/image_raw -r camera_info:=/camera_info --params-file  `ros2 pkg prefix apriltag_ros`/cfg/tags_36h11.yaml
+- ros2 run rqt_image_view rqt_image_view
+- ros2 topic echo /detections
 
 ### TO INSTALL PACKAGE FOR ASSIGNMENT - From monicadelaine/f24_robotics Github
 
